@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmUsListagem">
+			<p:dataTable id="tblUsuario" widgetVar="tabelaUsuarios"
+				emptyMessage="Nenhum registro encontrado!"
+				value="#{MBUsuario.itens}" var="item"
+				filteredValue="#{MBUsuario.itensFiltrados}" rows="10"
+				paginator="true">
+				<f:facet name="header">
+        			Usuarios - Listagem
+    			</f:facet>
+
+				<!--     			Colunas -->
+				<p:column headerText="Id" sortBy="#{item.idusuario}"
+					filterBy="#{item.idusuario}">
+					<h:outputText value="#{item.idusuario}" />
+				</p:column>
+
+				<p:column headerText="Usuario" sortBy="#{item.usuario}"
+					filterBy="#{item.usuario}">
+					<h:outputText value="#{item.usuario}" />
+				</p:column>
+
+				<p:column headerText="Nome" sortBy="#{item.nome}"
+					filterBy="#{item.nome}">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+				
+				<p:column headerText="Senha" sortBy="#{item.senha}">
+					<h:outputText value="#{item.senha}" />
+				</p:column>
+				
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-trash" 
+										oncomplete="PF('dlgFabExcluir').show();"
+										update=":frmFabExcluir:pnlFabExcluir">
+					<f:setPropertyActionListener value="#{item}" target="#{MBUsuario.usuario}"/>					
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-pencil"
+										oncomplete="PF('dlgFabEditar').show();"
+										update="frmFabEditar:pnlFabEditar">
+					<f:setPropertyActionListener value="#{item}" target="#{MBUsuario.usuario}" />
+					</p:commandButton>
+				</p:column> 
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo" actionListener="#{MBUsuario.prepararNovo}"
+						oncomplete="PF('dlgUsNovo').show();" 
+						update="frmUsNovo:pnlUsNovo" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog header="Novo Usuario" widgetVar="dlgUsNovo" closable="true"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)">
+			<h:form id="frmUsNovo">
+				<h:panelGrid id="pnlUsNovo" columns="2">
+				
+					<p:outputLabel value="Usuario" />
+					<p:inputText size="30" maxlength="50" value="#{MBUsuario.usuario.usuario}" />
+					
+					<p:outputLabel value="Nome" />
+					<p:inputText size="30" maxlength="50" value="#{MBUsuario.usuario.nome}" />
+					
+					<p:outputLabel value="Senha"/>
+					<p:password size="30" maxlength="50" value="#{MBUsuario.usuario.senha}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar" actionListener="#{MBUsuario.novo}"
+						oncomplete="PF('dlgUsNovo').hide(); tabelaUsuarios.clearFilters();"
+						update=":frmUsListagem:tblUsuario :msgGlobal" />
+					<p:commandButton value="Cancelar" onclick="PF('dlgUsNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgFabExcluir" closable="false" draggable="false"
+					resizable="false" modal="true" appendTo="@(body)" header="Usuario - Excluir">
+					
+					<h:form id="frmFabExcluir">
+						<h:panelGrid id="pnlFabExcluir" columns="2">
+						
+							<p:outputLabel value="Código: " />
+							<h:outputText value="#{MBUsuario.usuario.idusuario}" />
+							
+							<p:outputLabel value="Usuário: " />
+							<h:outputText value="#{MBUsuario.usuario.usuario}" />
+							
+							<p:outputLabel value="Nome: " />
+							<h:outputText value="#{MBUsuario.usuario.nome}" />
+							
+						</h:panelGrid>
+						
+						<h:panelGrid columns="2">
+							<p:commandButton value="Excluir" actionListener="#{MBUsuario.excluir}"
+							 					oncomplete="PF('dlgFabExcluir').hide(); PF('tabelaFabricantes').clearFilters();"
+							 					update=":frmUsListagem:tblUsuario :msgGlobal"/>
+							<p:commandButton value="Cancelar" onclick="PF('dlgFabExcluir').hide();"/>
+						</h:panelGrid>
+					</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgFabEditar" closable="false" draggable="false"
+					resizable="false" modal="true" appendTo="@(body)" header="Fabricante - Editar">
+					
+					<h:form id="frmFabEditar">
+						<h:panelGrid id="pnlFabEditar" columns="2">
+							<p:outputLabel value="Código"/>
+							<h:outputText value="#{MBUsuario.usuario.idusuario}" />
+							
+							<p:outputLabel value="Usuário"/>
+							<h:inputText value="#{MBUsuario.usuario.usuario}" size="30" maxlength="50"/>
+							
+							<p:outputLabel value="Nome" />
+							<h:inputText value="#{MBUsuario.usuario.nome}" size="30" maxlength="50"/>
+							
+						</h:panelGrid>
+						
+						<h:panelGrid columns="2">
+							<p:commandButton value="Editar" actionListener="#{MBUsuario.editar}"
+												oncomplete="PF('dlgFabEditar').hide(); PF('tabelaFabricantes').clearFilters();"
+												update="frmUsListagem:tblUsuario :msgGlobal" />
+							<p:commandButton value="Cancelar" onclick="PF('dlgFabEditar').hide();" />
+						</h:panelGrid>
+					</h:form>
+		
+		</p:dialog>
+		
+	</ui:define>
+	
+	<ui:define name="menuReceitas">
+		<ui:include src="/includes/menuReceita.xhtml"></ui:include>
+	</ui:define>
+
+</ui:composition>
